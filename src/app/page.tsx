@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 const Banner = () => (
@@ -10,10 +11,23 @@ const Banner = () => (
   </div>
 );
 
-const ChatWindow = ({ messages, input, setInput, handleSend, isLoading }: any) => (
+interface Message {
+  text: string;
+  sender: 'user' | 'agent';
+}
+
+interface ChatWindowProps {
+  messages: Message[];
+  input: string;
+  setInput: (input: string) => void;
+  handleSend: () => void;
+  isLoading: boolean;
+}
+
+const ChatWindow = ({ messages, input, setInput, handleSend, isLoading }: ChatWindowProps) => (
   <div className="w-full max-w-2xl mx-auto bg-black bg-opacity-70 backdrop-blur-2xl rounded-3xl shadow-2xl p-10 flex flex-col items-center border border-blue-900 animate-fade-in">
     <div className="w-full h-80 overflow-y-auto mb-6 space-y-4">
-      {messages.map((msg: any, idx: number) => (
+      {messages.map((msg: Message, idx: number) => (
         <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
           <div className={`p-4 rounded-2xl max-w-md text-lg font-medium ${msg.sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-blue-200'}`}>{msg.text}</div>
         </div>
@@ -74,6 +88,14 @@ const BusinessSection = () => (
   </div>
 );
 
+const Footer = () => (
+  <footer className="w-full border-t border-white/10 py-6 text-center text-xs text-gray-500">
+    <Link href="/demos" className="text-blue-300 hover:text-white">
+      Demo Sites
+    </Link>
+  </footer>
+);
+
 export default function Page() {
   const [messages, setMessages] = useState<{ text: string; sender: 'user' | 'agent' }[]>([]);
   const [input, setInput] = useState('');
@@ -114,6 +136,7 @@ export default function Page() {
         />
       </div>
       <BusinessSection />
+      <Footer />
     </div>
   );
 }
