@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMIÈRE | Upscale Grooming</title>
+  <meta name="description" content="Premium barbershop experience. Styled for the modern gentleman." />
+
+  <!-- Social / SEO -->
+  <meta property="og:title" content="LUMIÈRE | Upscale Grooming" />
+  <meta property="og:description" content="Where precision meets luxury. Book your appointment." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://images.unsplash.com/photo-1634302068832-72c0c7a52f4c?q=80&w=1600&auto=format&fit=crop" />
+  <meta name="theme-color" content="#C4A484" />
+
+  <!-- Performance: preconnect for fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #C4A484; /* Light Brown / Camel */
+      --color-secondary: #EBE5CE; /* Cream */
+      --color-dark: #2A2A2A;
+      --shadow-soft: 0 20px 40px -5px rgba(196, 164, 132, 0.15);
+      --ring: 0 0 0 3px rgba(196, 164, 132, 0.25);
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #FAFAFA;
+      color: var(--color-dark);
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, .serif {
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(196, 164, 132, 0.2);
+    }
+
+    .btn-luxury {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s ease;
+      isolation: isolate;
+    }
+
+    .btn-luxury::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: #1f1f1f;
+      transform: scaleX(0);
+      transform-origin: bottom right;
+      transition: transform 0.35s ease-out;
+      z-index: -1;
+    }
+
+    .btn-luxury:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+
+    .btn-luxury:hover {
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-luxury:focus-visible,
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible {
+      outline: none;
+      box-shadow: var(--ring);
+      border-radius: 0.25rem;
+    }
+
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation: none !important; transition: none !important; }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #D2B48C; border-radius: 4px; }
+
+    .service-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      will-change: transform;
+    }
+
+    .service-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-soft);
+      border-color: rgba(196, 164, 132, 0.25);
+    }
+
+    .image-reveal { clip-path: inset(0 100% 0 0); }
+
+    /* Fancy underline for nav links */
+    .navlink {
+      position: relative;
+      padding-bottom: 6px;
+    }
+
+    .navlink::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 1px;
+      width: 100%;
+      background: rgba(196, 164, 132, 0.9);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.25s ease;
+    }
+
+    .navlink:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* Subtle grain overlay */
+    .grain::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      mix-blend-mode: multiply;
+      background-image: url('data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/></filter><rect width="140" height="140" filter="url(%23n)" opacity="0.35"/></svg>');
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 70;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 720px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.25);
+      border-radius: 14px;
+      overflow: hidden;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open .modal {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Animated fade-up: initial state */
+    .animate-fade-up { opacity: 0; transform: translateY(22px); }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.12);
+      padding: 10px 12px;
+      z-index: 80;
+      transform: translateY(-120%);
+      transition: transform 0.2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+  </style>
+</head>
+
+<body class="antialiased">
+  <a class="skip-link text-sm" href="#main">Skip to content</a>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <div class="bg-white/95 backdrop-blur border border-gray-200 rounded-full px-5 py-3 shadow-sm flex items-center gap-3">
+      <i data-lucide="check" class="w-4 h-4 text-[#C4A484]"></i>
+      <p id="toastText" class="text-sm text-gray-700">Saved.</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar" aria-label="Primary">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="#" class="text-2xl font-semibold tracking-widest serif text-gray-800" aria-label="LUMIÈRE home">LUMIÈRE</a>
+
+      <div class="hidden md:flex space-x-12 text-sm uppercase tracking-widest font-light text-gray-600" role="navigation" aria-label="Section links">
+        <a href="#services" class="navlink hover:text-[#C4A484] transition-colors">Services</a>
+        <a href="#about" class="navlink hover:text-[#C4A484] transition-colors">The Studio</a>
+        <a href="#gallery" class="navlink hover:text-[#C4A484] transition-colors">Gallery</a>
+        <a href="#contact" class="navlink hover:text-[#C4A484] transition-colors">Contact</a>
+      </div>
+
+      <a href="#book" class="hidden md:inline-block px-8 py-3 border border-[#C4A484] text-[#C4A484] hover:bg-[#C4A484] hover:text-white transition-all duration-300 text-xs uppercase tracking-widest">
+        Book Seat
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-800" id="mobileMenuBtn" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-0 bg-white z-40 transform translate-x-full transition-transform duration-300 flex flex-col justify-center items-center space-y-8"
+      aria-hidden="true"
+    >
+      <button class="absolute top-6 right-6" id="mobileCloseBtn" aria-label="Close menu">
+        <i data-lucide="x" class="w-8 h-8 text-gray-800"></i>
+      </button>
+      <a href="#services" class="text-2xl serif text-gray-800">Services</a>
+      <a href="#about" class="text-2xl serif text-gray-800">The Studio</a>
+      <a href="#gallery" class="text-2xl serif text-gray-800">Gallery</a>
+      <a href="#book" class="text-2xl serif text-[#C4A484]">Book Now</a>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- Hero Section -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden grain" aria-label="Hero">
+      <!-- Background Image with Overlay -->
+      <div class="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1634302068832-72c0c7a52f4c?q=80&w=2670&auto=format&fit=crop"
+          alt="Upscale barbershop interior"
+          class="w-full h-full object-cover opacity-90"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <div class="absolute inset-0 bg-white/20 backdrop-blur-[2px]"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-[#FAFAFA]"></div>
+      </div>
+
+      <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
+        <p class="text-[#C4A484] text-sm md:text-base uppercase tracking-[0.3em] mb-4 animate-fade-up">Est. 2024</p>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl text-gray-900 mb-8 animate-fade-up" style="line-height: 1;">
+          Elevated <br /> <span class="italic text-[#C4A484]">Grooming</span>
+        </h1>
+        <p class="text-gray-600 text-lg font-light mb-10 max-w-2xl mx-auto animate-fade-up">
+          Where precision meets luxury. Experience the art of the cut in a sanctuary designed for the modern gentleman.
+        </p>
+        <div class="animate-fade-up flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a href="#book" class="btn-luxury inline-block bg-[#2A2A2A] text-white px-10 py-4 text-sm uppercase tracking-widest rounded-sm">
+            Book Appointment
+          </a>
+          <button
+            type="button"
+            id="openLookFinder"
+            class="inline-flex items-center gap-2 px-10 py-4 text-sm uppercase tracking-widest border border-gray-900/20 bg-white/60 hover:bg-white transition rounded-sm"
+            aria-haspopup="dialog"
+            aria-controls="lookModal"
+          >
+            <i data-lucide="scan-face" class="w-4 h-4"></i>
+            Style Finder
+          </button>
+        </div>
+
+        <!-- Trust Row -->
+        <div class="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-4 text-xs uppercase tracking-[0.22em] text-gray-500">
+          <span class="inline-flex items-center gap-2"><i data-lucide="clock" class="w-4 h-4 text-[#C4A484]"></i>On-time seats</span>
+          <span class="inline-flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-[#C4A484]"></i>Sanitized tools</span>
+          <span class="inline-flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[#C4A484]"></i>Hot towel finish</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 bg-[#FAFAFA]" aria-label="Services">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16">
+          <div>
+            <h4 class="text-[#C4A484] uppercase tracking-widest text-xs mb-2">Our Menu</h4>
+            <h2 class="text-4xl md:text-5xl text-gray-900 serif">Signature Services</h2>
+          </div>
+          <p class="text-gray-500 font-light mt-4 md:mt-0 max-w-md text-sm">
+            Each service includes a consultation, wash, style, and our signature hot towel finish.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Service 1 -->
+          <article class="service-card bg-white p-10 border border-gray-100 rounded-sm" aria-label="The Executive Cut">
+            <div class="flex justify-between items-start mb-6">
+              <i data-lucide="scissors" class="w-8 h-8 text-[#C4A484]"></i>
+              <span class="text-lg font-medium">$55</span>
+            </div>
+            <h3 class="text-2xl serif mb-3 text-gray-800">The Executive Cut</h3>
+            <p class="text-gray-500 font-light text-sm leading-relaxed mb-6">
+              Precision shear work tailored to your head shape and lifestyle. Includes straight razor neck shave.
+            </p>
+            <div class="flex items-center justify-between gap-4">
+              <a href="#book" class="text-xs uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-1 hover:border-[#C4A484] transition-colors">Book Now</a>
+              <button type="button" class="serviceAdd text-xs uppercase tracking-widest text-[#C4A484] hover:text-gray-900 transition" data-service="Executive Cut" data-price="55">
+                Add to booking
+              </button>
+            </div>
+          </article>
+
+          <!-- Service 2 -->
+          <article class="service-card bg-white p-10 border border-gray-100 rounded-sm relative overflow-hidden" aria-label="Royal Shave">
+            <div class="absolute top-0 right-0 bg-[#C4A484] text-white text-[10px] px-3 py-1 uppercase tracking-widest">Popular</div>
+            <div class="flex justify-between items-start mb-6">
+              <i data-lucide="crown" class="w-8 h-8 text-[#C4A484]"></i>
+              <span class="text-lg font-medium">$75</span>
+            </div>
+            <h3 class="text-2xl serif mb-3 text-gray-800">Royal Shave</h3>
+            <p class="text-gray-500 font-light text-sm leading-relaxed mb-6">
+              Traditional hot towel straight razor shave using premium oils and calming balms for zero irritation.
+            </p>
+            <div class="flex items-center justify-between gap-4">
+              <a href="#book" class="text-xs uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-1 hover:border-[#C4A484] transition-colors">Book Now</a>
+              <button type="button" class="serviceAdd text-xs uppercase tracking-widest text-[#C4A484] hover:text-gray-900 transition" data-service="Royal Shave" data-price="75">
+                Add to booking
+              </button>
+            </div>
+          </article>
+
+          <!-- Service 3 -->
+          <article class="service-card bg-white p-10 border border-gray-100 rounded-sm" aria-label="The Full Restoration">
+            <div class="flex justify-between items-start mb-6">
+              <i data-lucide="sparkles" class="w-8 h-8 text-[#C4A484]"></i>
+              <span class="text-lg font-medium">$95</span>
+            </div>
+            <h3 class="text-2xl serif mb-3 text-gray-800">The Full Restoration</h3>
+            <p class="text-gray-500 font-light text-sm leading-relaxed mb-6">
+              Haircut, beard sculpt, facial scrub, and black mask treatment. The ultimate reset button.
+            </p>
+            <div class="flex items-center justify-between gap-4">
+              <a href="#book" class="text-xs uppercase tracking-widest text-gray-900 border-b border-gray-300 pb-1 hover:border-[#C4A484] transition-colors">Book Now</a>
+              <button type="button" class="serviceAdd text-xs uppercase tracking-widest text-[#C4A484] hover:text-gray-900 transition" data-service="Full Restoration" data-price="95">
+                Add to booking
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <!-- Micro-proof row -->
+        <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white border border-gray-100 rounded-sm p-7 flex items-start gap-4">
+            <i data-lucide="badge-check" class="w-6 h-6 text-[#C4A484]"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Satisfaction standard</p>
+              <p class="text-sm text-gray-500 font-light">If it's not clean, we refine it. Simple.</p>
+            </div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-sm p-7 flex items-start gap-4">
+            <i data-lucide="spray-can" class="w-6 h-6 text-[#C4A484]"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Signature finish</p>
+              <p class="text-sm text-gray-500 font-light">Hot towel, balm, and a final detail pass.</p>
+            </div>
+          </div>
+          <div class="bg-white border border-gray-100 rounded-sm p-7 flex items-start gap-4">
+            <i data-lucide="coffee" class="w-6 h-6 text-[#C4A484]"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Quiet luxury</p>
+              <p class="text-sm text-gray-500 font-light">Coffee, water, and silence that feels expensive.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual / About Section -->
+    <section id="about" class="py-24 bg-white overflow-hidden" aria-label="About">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div class="relative">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#F5F1E8] rounded-full mix-blend-multiply filter blur-2xl opacity-70"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-[#C4A484] rounded-full mix-blend-multiply filter blur-2xl opacity-20"></div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1599351431202-6e0c06e76553?q=80&w=800&auto=format&fit=crop"
+                class="w-full h-80 object-cover rounded-sm image-reveal gs-reveal"
+                alt="Barber tools"
+                loading="lazy"
+              />
+              <img
+                src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=800&auto=format&fit=crop"
+                class="w-full h-80 object-cover rounded-sm mt-12 image-reveal gs-reveal"
+                alt="Interior detail"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div class="lg:pl-10">
+            <h4 class="text-[#C4A484] uppercase tracking-widest text-xs mb-2">The Philosophy</h4>
+            <h2 class="text-4xl md:text-5xl text-gray-900 serif mb-8 leading-tight">
+              Not just a haircut.<br />
+              <span class="italic text-gray-500">A Ritual.</span>
+            </h2>
+            <p class="text-gray-600 font-light leading-relaxed mb-6">
+              At LUMIÈRE, grooming is a foundational pillar of confidence. We stripped away the noise to create a minimal,
+              light-filled space where the focus is entirely on you.
+            </p>
+            <p class="text-gray-600 font-light leading-relaxed mb-10">
+              Our barbers combine modern facial proportion guidance with old-world razor technique to craft a look that
+              complements your structure and lifestyle.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              <div class="flex -space-x-4" aria-label="Barbers">
+                <img class="w-12 h-12 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=60" alt="Barber portrait" loading="lazy" />
+                <img class="w-12 h-12 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&auto=format&fit=crop&q=60" alt="Barber portrait" loading="lazy" />
+                <img class="w-12 h-12 rounded-full border-2 border-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=60" alt="Barber portrait" loading="lazy" />
+              </div>
+
+              <div>
+                <p class="text-sm font-medium text-gray-900">Meet the Masters <span class="text-[#C4A484]">→</span></p>
+                <p class="text-sm text-gray-500 font-light">Detail-obsessed. Quiet. Dangerous with scissors.</p>
+              </div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="mt-12 border-t border-gray-100 pt-10">
+              <h3 class="text-xl serif text-gray-900 mb-5">Client Notes</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <figure class="bg-[#FAFAFA] border border-gray-100 rounded-sm p-6">
+                  <blockquote class="text-sm text-gray-600 font-light leading-relaxed">"Best cut I've had in years. The attention to detail is unreal."</blockquote>
+                  <figcaption class="mt-4 text-xs uppercase tracking-widest text-gray-500">- A. Reynolds</figcaption>
+                </figure>
+                <figure class="bg-[#FAFAFA] border border-gray-100 rounded-sm p-6">
+                  <blockquote class="text-sm text-gray-600 font-light leading-relaxed">"Feels like a reset. Clean space, calm energy, perfect finish."</blockquote>
+                  <figcaption class="mt-4 text-xs uppercase tracking-widest text-gray-500">- M. Carter</figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery / Vibe -->
+    <section id="gallery" class="py-24 bg-[#FAFAFA]" aria-label="Gallery">
+      <div class="max-w-7xl mx-auto px-6 mb-12 text-center">
+        <h2 class="text-4xl serif text-gray-900">The Aesthetic</h2>
+        <p class="mt-4 text-gray-500 font-light text-sm max-w-2xl mx-auto">Texture, space, and the kind of lighting that makes everyone look like a better decision.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 px-2">
+        <button class="group relative overflow-hidden h-80 w-full cursor-pointer" type="button" data-lightbox="Texture" data-img="https://images.unsplash.com/photo-1503951914875-befbb7470d03?q=80&w=1600&auto=format&fit=crop">
+          <img src="https://images.unsplash.com/photo-1503951914875-befbb7470d03?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Hair texture" loading="lazy" />
+          <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span class="text-white serif italic text-xl">Texture</span>
+          </div>
+        </button>
+
+        <button class="group relative overflow-hidden h-80 w-full cursor-pointer md:mt-12" type="button" data-lightbox="Space" data-img="https://images.unsplash.com/photo-1635273051937-9384dc921504?q=80&w=1600&auto=format&fit=crop">
+          <img src="https://images.unsplash.com/photo-1635273051937-9384dc921504?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Interior space" loading="lazy" />
+          <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span class="text-white serif italic text-xl">Space</span>
+          </div>
+        </button>
+
+        <button class="group relative overflow-hidden h-80 w-full cursor-pointer" type="button" data-lightbox="Product" data-img="https://images.unsplash.com/photo-1622287162716-f311baa31296?q=80&w=1600&auto=format&fit=crop">
+          <img src="https://images.unsplash.com/photo-1622287162716-f311baa31296?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Grooming product" loading="lazy" />
+          <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span class="text-white serif italic text-xl">Product</span>
+          </div>
+        </button>
+
+        <button class="group relative overflow-hidden h-80 w-full cursor-pointer md:mt-12" type="button" data-lightbox="Details" data-img="https://images.unsplash.com/photo-1593702288056-b60585a691c0?q=80&w=1600&auto=format&fit=crop">
+          <img src="https://images.unsplash.com/photo-1593702288056-b60585a691c0?q=80&w=800&auto=format&fit=crop" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Straight razor shave" loading="lazy" />
+          <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span class="text-white serif italic text-xl">Details</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Lightbox Modal -->
+      <div id="lightbox" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Gallery image" tabindex="-1">
+        <div class="modal" style="max-width: 980px;">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <p id="lightboxTitle" class="text-sm uppercase tracking-widest text-gray-600">Preview</p>
+            <button type="button" id="lightboxClose" class="p-2 rounded-md hover:bg-gray-50" aria-label="Close preview">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div class="bg-black">
+            <img id="lightboxImg" src="" alt="" class="w-full max-h-[70vh] object-contain" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking CTA -->
+    <section id="book" class="py-32 relative bg-[#2A2A2A] text-white overflow-hidden grain" aria-label="Booking">
+      <div class="absolute inset-0 opacity-20">
+        <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2000&auto=format&fit=crop" class="w-full h-full object-cover grayscale" alt="Barbershop background" loading="lazy" />
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#2A2A2A] via-[#2A2A2A]/90 to-transparent"></div>
+
+      <div class="relative z-10 max-w-5xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <h2 class="text-4xl md:text-6xl serif mb-6">Ready to Elevate Your Look?</h2>
+            <p class="text-gray-400 font-light mb-8 text-lg">Appointments are released weekly. Secure your spot with our senior stylists.</p>
+
+            <!-- Booking summary -->
+            <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+              <div class="flex items-center justify-between">
+                <p class="text-xs uppercase tracking-widest text-gray-300">Your selection</p>
+                <button type="button" id="clearCart" class="text-xs uppercase tracking-widest text-[#C4A484] hover:text-white transition">Clear</button>
+              </div>
+              <ul id="cartItems" class="mt-4 space-y-3 text-sm text-gray-200">
+                <li class="text-gray-500">No services selected. Go ahead, treat yourself.</li>
+              </ul>
+              <div class="mt-5 pt-5 border-t border-white/10 flex items-center justify-between">
+                <p class="text-sm text-gray-300">Estimated total</p>
+                <p id="cartTotal" class="text-lg font-semibold text-white">$0</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <form id="waitlistForm" class="bg-white/5 backdrop-blur-sm p-2 rounded-lg w-full border border-white/10" novalidate>
+              <label class="sr-only" for="email">Email</label>
+              <div class="flex flex-col md:flex-row">
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email for priority access"
+                  class="bg-transparent text-white px-6 py-4 outline-none flex-grow placeholder-gray-500 text-sm"
+                  autocomplete="email"
+                  required
+                />
+                <button type="submit" class="bg-[#C4A484] hover:bg-[#b08d68] text-white px-8 py-4 uppercase tracking-widest text-xs font-bold transition-colors rounded-sm mt-2 md:mt-0">
+                  Join Waitlist
+                </button>
+              </div>
+              <p id="emailHelp" class="text-xs text-gray-400 font-light px-4 pt-3">No spam. No nonsense. One email when seats drop.</p>
+            </form>
+
+            <div class="mt-8 text-center">
+              <span class="text-gray-500 text-sm uppercase tracking-widest block mb-4">- or -</span>
+              <button
+                id="bookDirect"
+                type="button"
+                class="border border-white/30 hover:bg-white hover:text-black transition-all px-10 py-3 uppercase tracking-widest text-xs rounded-sm"
+              >
+                Book Directly
+              </button>
+              <p class="mt-4 text-xs text-gray-500">(Hook this to your booking platform: Calendly, Fresha, Square, whatever.)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-24 bg-white" aria-label="Contact">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+          <div>
+            <h4 class="text-[#C4A484] uppercase tracking-widest text-xs mb-2">Contact</h4>
+            <h2 class="text-4xl md:text-5xl text-gray-900 serif">Find Us</h2>
+            <p class="mt-6 text-gray-600 font-light leading-relaxed">
+              Walk-ins are welcome when space allows, but appointments get priority. If you're late, we'll still love you,
+              just from a distance.
+            </p>
+
+            <div class="mt-10 space-y-5 text-sm">
+              <div class="flex items-start gap-4">
+                <i data-lucide="map-pin" class="w-5 h-5 text-[#C4A484] mt-0.5"></i>
+                <p class="text-gray-600">
+                  <span class="font-medium text-gray-900">128 Luxury Ave, Suite 400</span><br />
+                  Ghost District, NY 10012
+                </p>
+              </div>
+              <div class="flex items-start gap-4">
+                <i data-lucide="phone" class="w-5 h-5 text-[#C4A484] mt-0.5"></i>
+                <p class="text-gray-600"><span class="font-medium text-gray-900">(212) 555-0199</span><br />Text for fastest response</p>
+              </div>
+              <div class="flex items-start gap-4">
+                <i data-lucide="mail" class="w-5 h-5 text-[#C4A484] mt-0.5"></i>
+                <p class="text-gray-600"><span class="font-medium text-gray-900">concierge@lumiere.studio</span><br />For collaborations & press</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-[#FAFAFA] border border-gray-100 rounded-lg p-8">
+            <h3 class="text-2xl serif text-gray-900">Hours</h3>
+            <ul class="mt-6 text-gray-600 text-sm space-y-3">
+              <li class="flex justify-between"><span>Mon - Fri</span> <span class="font-medium text-gray-900">10am - 8pm</span></li>
+              <li class="flex justify-between"><span>Saturday</span> <span class="font-medium text-gray-900">9am - 6pm</span></li>
+              <li class="flex justify-between"><span>Sunday</span> <span class="font-medium text-gray-900">Closed</span></li>
+            </ul>
+
+            <div class="mt-10">
+              <h4 class="text-xs uppercase tracking-widest text-gray-900 font-bold">Social</h4>
+              <div class="mt-4 flex space-x-4">
+                <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Instagram"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Twitter"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Facebook"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+              </div>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-gray-200">
+              <h4 class="text-xs uppercase tracking-widest text-gray-900 font-bold">Quick Actions</h4>
+              <div class="mt-4 flex flex-wrap gap-3">
+                <button type="button" id="copyAddress" class="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-xs uppercase tracking-widest rounded-sm">
+                  Copy Address
+                </button>
+                <button type="button" id="copyPhone" class="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-xs uppercase tracking-widest rounded-sm">
+                  Copy Phone
+                </button>
+                <button type="button" id="openMaps" class="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-xs uppercase tracking-widest rounded-sm">
+                  Open Maps
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white pt-16 pb-10 border-t border-gray-100" aria-label="Footer">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-14">
+        <div class="col-span-1 md:col-span-1">
+          <a href="#" class="text-2xl font-semibold tracking-widest serif text-gray-900 block mb-6">LUMIÈRE</a>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Redefining the modern barbershop experience through minimalism, precision, and craft.
+          </p>
+        </div>
+
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-widest text-gray-900 mb-6">Location</h5>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            128 Luxury Ave, Suite 400<br />
+            Ghost District, NY 10012
+          </p>
+        </div>
+
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-widest text-gray-900 mb-6">Hours</h5>
+          <ul class="text-gray-500 text-sm space-y-2">
+            <li class="flex justify-between max-w-[180px]"><span>Mon - Fri</span> <span>10am - 8pm</span></li>
+            <li class="flex justify-between max-w-[180px]"><span>Saturday</span> <span>9am - 6pm</span></li>
+            <li class="flex justify-between max-w-[180px]"><span>Sunday</span> <span>Closed</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5 class="text-xs font-bold uppercase tracking-widest text-gray-900 mb-6">Social</h5>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Instagram"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+            <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Twitter"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+            <a href="#" class="text-gray-400 hover:text-[#C4A484] transition-colors" aria-label="Facebook"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-100 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-400">
+        <p>&copy; <span id="year"></span> Lumière Barbershop. All rights reserved.</p>
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-3 mt-4 md:mt-0">
+          <a href="#" class="hover:text-gray-600">Privacy Policy</a>
+          <a href="#" class="hover:text-gray-600">Terms of Service</a>
+          <span class="opacity-50">Powered by Ghost AI Systems</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Style Finder Modal -->
+  <div id="lookModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="lookTitle" tabindex="-1">
+    <div class="modal">
+      <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-widest text-gray-500">LUMIÈRE</p>
+          <h3 id="lookTitle" class="text-2xl serif text-gray-900">Style Finder</h3>
+        </div>
+        <button type="button" id="closeLookFinder" class="p-2 rounded-md hover:bg-gray-50" aria-label="Close">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6">
+        <p class="text-sm text-gray-600 font-light leading-relaxed">
+          Pick your hair length and vibe. We'll recommend a service and a cut direction. Humans still have to do the actual cutting.
+        </p>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label class="text-xs uppercase tracking-widest text-gray-700" for="length">Hair length</label>
+            <select id="length" class="mt-2 w-full border border-gray-200 bg-white px-4 py-3 text-sm rounded-md">
+              <option value="short">Short</option>
+              <option value="medium">Medium</option>
+              <option value="long">Long</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs uppercase tracking-widest text-gray-700" for="vibe">Vibe</label>
+            <select id="vibe" class="mt-2 w-full border border-gray-200 bg-white px-4 py-3 text-sm rounded-md">
+              <option value="clean">Clean / Executive</option>
+              <option value="modern">Modern / Textured</option>
+              <option value="bold">Bold / Statement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-6 p-5 bg-[#FAFAFA] border border-gray-100 rounded-md">
+          <p class="text-xs uppercase tracking-widest text-gray-500">Recommendation</p>
+          <p id="lookRec" class="mt-2 text-sm text-gray-800">Select options to see your match.</p>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <button type="button" id="applyRec" class="btn-luxury bg-[#2A2A2A] text-white px-6 py-3 text-xs uppercase tracking-widest rounded-sm">
+            Add recommended service
+          </button>
+          <a href="#services" id="goServices" class="text-xs uppercase tracking-widest text-gray-600 hover:text-[#C4A484]">Browse services</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Icons
+    lucide.createIcons();
+
+    // -----------------------------
+    // Helpers
+    // -----------------------------
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+    const toast = $('#toast');
+    const toastText = $('#toastText');
+    let toastTimer;
+    function showToast(msg) {
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    // -----------------------------
+    // Mobile menu (with ARIA)
+    // -----------------------------
+    const mobileMenu = $('#mobile-menu');
+    const mobileMenuBtn = $('#mobileMenuBtn');
+    const mobileCloseBtn = $('#mobileCloseBtn');
+
+    function openMobileMenu() {
+      mobileMenu.classList.remove('translate-x-full');
+      document.body.classList.add('overflow-hidden');
+      mobileMenuBtn.setAttribute('aria-expanded', 'true');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeMobileMenu() {
+      mobileMenu.classList.add('translate-x-full');
+      document.body.classList.remove('overflow-hidden');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    mobileMenuBtn.addEventListener('click', openMobileMenu);
+    mobileCloseBtn.addEventListener('click', closeMobileMenu);
+
+    // Close menu when clicking a link
+    $$('#mobile-menu a').forEach(a => a.addEventListener('click', closeMobileMenu));
+
+    // Close menu on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!mobileMenu.classList.contains('translate-x-full')) closeMobileMenu();
+        if ($('#lookModal').classList.contains('open')) closeLookModal();
+        if ($('#lightbox').classList.contains('open')) closeLightbox();
+      }
+    });
+
+    // -----------------------------
+    // GSAP animations (respect reduced motion)
+    // -----------------------------
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReducedMotion) {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Fade-up for elements
+      $$('.animate-fade-up').forEach((el, idx) => {
+        gsap.to(el, {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power3.out',
+          delay: Math.min(idx * 0.08, 0.35),
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%'
+          }
+        });
+      });
+
+      // Image reveals
+      $$('.gs-reveal').forEach(img => {
+        gsap.to(img, {
+          clipPath: 'inset(0 0 0 0)',
+          duration: 1.4,
+          ease: 'power2.inOut',
+          scrollTrigger: {
+            trigger: img,
+            start: 'top 75%'
+          }
+        });
+      });
+    } else {
+      // Reduced motion: just show
+      $$('.animate-fade-up').forEach(el => { el.style.opacity = 1; el.style.transform = 'none'; });
+      $$('.gs-reveal').forEach(img => { img.style.clipPath = 'inset(0 0 0 0)'; });
+    }
+
+    // -----------------------------
+    // Navbar scroll effect
+    // -----------------------------
+    const navbar = $('#navbar');
+    function onScroll() {
+      if (window.scrollY > 50) {
+        navbar.classList.add('shadow-sm');
+        navbar.classList.add('bg-white/95');
+      } else {
+        navbar.classList.remove('shadow-sm');
+        navbar.classList.remove('bg-white/95');
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // -----------------------------
+    // Booking cart (simple, local)
+    // -----------------------------
+    const cartKey = 'lumiere_cart_v1';
+    let cart = [];
+
+    const cartItemsEl = $('#cartItems');
+    const cartTotalEl = $('#cartTotal');
+
+    function loadCart() {
+      try {
+        cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+        if (!Array.isArray(cart)) cart = [];
+      } catch { cart = []; }
+      renderCart();
+    }
+
+    function saveCart() {
+      localStorage.setItem(cartKey, JSON.stringify(cart));
+    }
+
+    function currency(n) { return `$${n}`; }
+
+    function renderCart() {
+      if (!cart.length) {
+        cartItemsEl.innerHTML = '<li class="text-gray-500">No services selected. Go ahead, treat yourself.</li>';
+        cartTotalEl.textContent = '$0';
+        return;
+      }
+
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      cartTotalEl.textContent = currency(total);
+
+      cartItemsEl.innerHTML = cart
+        .map((item, i) => `
+          <li class="flex items-center justify-between gap-4">
+            <span>${item.name}</span>
+            <span class="flex items-center gap-3">
+              <span class="text-gray-300">${currency(item.price)}</span>
+              <button class="removeItem text-[#C4A484] hover:text-white transition" data-index="${i}" aria-label="Remove ${item.name}">
+                Remove
+              </button>
+            </span>
+          </li>
+        `)
+        .join('');
+
+      $$('.removeItem', cartItemsEl).forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.index);
+          cart.splice(idx, 1);
+          saveCart();
+          renderCart();
+          showToast('Removed from booking');
+        });
+      });
+    }
+
+    function addToCart(name, price) {
+      cart.push({ name, price: Number(price) });
+      saveCart();
+      renderCart();
+      showToast('Added to booking');
+    }
+
+    $$('.serviceAdd').forEach(btn => {
+      btn.addEventListener('click', () => addToCart(btn.dataset.service, btn.dataset.price));
+    });
+
+    $('#clearCart').addEventListener('click', () => {
+      cart = [];
+      saveCart();
+      renderCart();
+      showToast('Cleared');
+    });
+
+    loadCart();
+
+    // -----------------------------
+    // Waitlist form (client-side validate)
+    // -----------------------------
+    const waitlistForm = $('#waitlistForm');
+    waitlistForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = $('#email').value.trim();
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!ok) {
+        showToast('Enter a valid email');
+        $('#email').focus();
+        return;
+      }
+      // Placeholder action: wire to your backend
+      showToast('You\'re on the list');
+      waitlistForm.reset();
+    });
+
+    $('#bookDirect').addEventListener('click', () => {
+      showToast('Connect this button to your booking link');
+    });
+
+    // -----------------------------
+    // Copy + Maps actions
+    // -----------------------------
+    async function copyText(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(`${label} copied`);
+      } catch {
+        showToast('Clipboard blocked');
+      }
+    }
+
+    $('#copyAddress').addEventListener('click', () => copyText('128 Luxury Ave, Suite 400, Ghost District, NY 10012', 'Address'));
+    $('#copyPhone').addEventListener('click', () => copyText('(212) 555-0199', 'Phone'));
+    $('#openMaps').addEventListener('click', () => {
+      const q = encodeURIComponent('128 Luxury Ave, Suite 400, Ghost District, NY 10012');
+      window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank', 'noopener');
+    });
+
+    // -----------------------------
+    // Lightbox
+    // -----------------------------
+    const lightbox = $('#lightbox');
+    const lightboxImg = $('#lightboxImg');
+    const lightboxTitle = $('#lightboxTitle');
+
+    function openLightbox(title, img) {
+      lightboxTitle.textContent = title;
+      lightboxImg.src = img;
+      lightboxImg.alt = title;
+      lightbox.classList.add('open');
+      document.body.classList.add('overflow-hidden');
+      lightbox.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.body.classList.remove('overflow-hidden');
+      lightboxImg.src = '';
+    }
+
+    $$('#gallery [data-lightbox]').forEach(btn => {
+      btn.addEventListener('click', () => openLightbox(btn.dataset.lightbox, btn.dataset.img));
+    });
+
+    $('#lightboxClose').addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // -----------------------------
+    // Style Finder modal
+    // -----------------------------
+    const lookModal = $('#lookModal');
+    const openLookFinderBtn = $('#openLookFinder');
+    const closeLookFinderBtn = $('#closeLookFinder');
+    const lengthSel = $('#length');
+    const vibeSel = $('#vibe');
+    const lookRec = $('#lookRec');
+    const applyRecBtn = $('#applyRec');
+    const goServices = $('#goServices');
+
+    let currentRec = null;
+
+    function computeRec() {
+      const length = lengthSel.value;
+      const vibe = vibeSel.value;
+
+      // Simple mapping: you can expand logic later.
+      if (vibe === 'clean') {
+        currentRec = { name: 'Executive Cut', price: 55, note: 'Clean lines, conservative taper, sharp silhouette.' };
+      } else if (vibe === 'modern') {
+        currentRec = { name: 'Executive Cut', price: 55, note: 'Textured top, soft taper, effortless finish.' };
+      } else {
+        currentRec = { name: 'Full Restoration', price: 95, note: 'Bold shape, beard sculpt, full reset and finish.' };
+      }
+
+      if (length === 'long' && vibe !== 'clean') {
+        currentRec = { name: 'Full Restoration', price: 95, note: 'Long hair deserves structure, conditioning, and a disciplined outline.' };
+      }
+
+      lookRec.textContent = `${currentRec.name} (${currency(currentRec.price)}): ${currentRec.note}`;
+    }
+
+    function openLookModal() {
+      lookModal.classList.add('open');
+      document.body.classList.add('overflow-hidden');
+      lookModal.focus();
+      computeRec();
+    }
+
+    function closeLookModal() {
+      lookModal.classList.remove('open');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    openLookFinderBtn.addEventListener('click', openLookModal);
+    closeLookFinderBtn.addEventListener('click', closeLookModal);
+    lookModal.addEventListener('click', (e) => {
+      if (e.target === lookModal) closeLookModal();
+    });
+
+    lengthSel.addEventListener('change', computeRec);
+    vibeSel.addEventListener('change', computeRec);
+
+    applyRecBtn.addEventListener('click', () => {
+      if (!currentRec) return;
+      addToCart(currentRec.name, currentRec.price);
+      closeLookModal();
+    });
+
+    goServices.addEventListener('click', () => {
+      closeLookModal();
+    });
+
+    // -----------------------------
+    // Footer year
+    // -----------------------------
+    $('#year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
